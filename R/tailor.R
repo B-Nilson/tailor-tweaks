@@ -178,7 +178,7 @@ print.tailor <- function(x, ...) {
 #'
 #' @keywords internal
 #' @export
-fit.tailor <- function(object, .data, outcome, estimate, probabilities = c(),
+fit.tailor <- function(object, .data, outcome, estimate, probabilities = c(), predictors = c(),
                        ...) {
   # ------------------------------------------------------------------------------
   # set columns via tidyselect
@@ -189,6 +189,7 @@ fit.tailor <- function(object, .data, outcome, estimate, probabilities = c(),
   columns$estimate <- names(tidyselect::eval_select(enquo(estimate), .data))
   check_selection(enquo(estimate), columns$estimate, "estimate")
   columns$probabilities <- names(tidyselect::eval_select(enquo(probabilities), .data))
+  columns$predictors <- names(tidyselect::eval_select(enquo(predictors), .data))
   if ("probability" %in%
       purrr::map_chr(object$adjustments, purrr::pluck, "inputs")) {
     check_selection(enquo(probabilities), columns$probabilities, "probabilities")
@@ -211,7 +212,7 @@ fit.tailor <- function(object, .data, outcome, estimate, probabilities = c(),
   object <- new_tailor(
     object$type,
     adjustments = object$adjustments,
-    columns = columns,
+    columns = columns[-which(names(columns) == "predictors")],
     ptype = ptype,
     call = current_env()
   )
